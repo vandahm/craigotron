@@ -13,10 +13,6 @@ and title != 'software-properties-common'
 
     apt::key { '4F4EA0AAE5267A6C': }
 
-#apt::ppa { 'ppa:ondrej/php5':
-#  require => Apt::Key['4F4EA0AAE5267A6C']
-#}
-
 file { '/home/vagrant/.bash_aliases':
   ensure => 'present',
   source => 'puppet:///modules/puphpet/dot/.bash_aliases',
@@ -53,15 +49,15 @@ apache::vhost { 'wpvagrant.dev':
 
 # Apache should run under vagrant's username
 file_line { 'apache_run_user':
-  path => '/etc/apache2/envvars',
-  line => 'export APACHE_RUN_USER=vagrant',
-  match => 'export APACHE_RUN_USER',
+  path    => '/etc/apache2/envvars',
+  line    => 'export APACHE_RUN_USER=vagrant',
+  match   => 'export APACHE_RUN_USER',
   require => Class['apache'],
 }
 file_line { 'apache_run_group':
-  path => '/etc/apache2/envvars',
-  line => 'export APACHE_RUN_GROUP=vagrant',
-  match => 'export APACHE_RUN_GROUP',
+  path    => '/etc/apache2/envvars',
+  line    => 'export APACHE_RUN_GROUP=vagrant',
+  match   => 'export APACHE_RUN_GROUP',
   require => Class['apache'],
 }
 
@@ -110,38 +106,38 @@ class { 'composer':
   require => Package['php5', 'curl'],
 }
 
-#puphpet::ini { 'xdebug':
-#  value   => [
-#    'xdebug.default_enable = 1',
-#    'xdebug.remote_autostart = 0',
-#    'xdebug.remote_connect_back = 1',
-#    'xdebug.remote_enable = 1',
-#    'xdebug.remote_handler = "dbgp"',
-#    'xdebug.remote_port = 9000'
-#  ],
-#  ini     => '/etc/php5/conf.d/zzz_xdebug.ini',
-#  notify  => Service['apache'],
-#  require => Class['php'],
-#}
+puphpet::ini { 'xdebug':
+  value   => [
+    'xdebug.default_enable = 1',
+    'xdebug.remote_autostart = 0',
+    'xdebug.remote_connect_back = 1',
+    'xdebug.remote_enable = 1',
+    'xdebug.remote_handler = "dbgp"',
+    'xdebug.remote_port = 9000'
+  ],
+  ini     => '/etc/php5/conf.d/zzz_xdebug.ini',
+  notify  => Service['apache'],
+  require => Class['php'],
+}
 
-#puphpet::ini { 'php':
-#  value   => [
-#    'date.timezone = "America/Chicago"'
-#  ],
-#  ini     => '/etc/php5/conf.d/zzz_php.ini',
-#  notify  => Service['apache'],
-#  require => Class['php'],
-#}
+puphpet::ini { 'php':
+  value   => [
+    'date.timezone = "America/Chicago"'
+  ],
+  ini     => '/etc/php5/conf.d/zzz_php.ini',
+  notify  => Service['apache'],
+  require => Class['php'],
+}
 
-#puphpet::ini { 'custom':
-#  value   => [
-#    'display_errors = On',
-#    'error_reporting = -1'
-#  ],
-#  ini     => '/etc/php5/conf.d/zzz_custom.ini',
-#  notify  => Service['apache'],
-#  require => Class['php'],
-#}
+puphpet::ini { 'custom':
+  value   => [
+    'display_errors = On',
+    'error_reporting = -1'
+  ],
+  ini     => '/etc/php5/conf.d/zzz_custom.ini',
+  notify  => Service['apache'],
+  require => Class['php'],
+}
 
 
 class { 'mysql::server':
