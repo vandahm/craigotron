@@ -1,0 +1,67 @@
+#!/usr/bin/env php
+<?php
+
+function fullpath($partial_path = '')
+{
+    return realpath(__DIR__ .'/../' . $partial_path);
+}
+
+$vhostTemplate = <<<END
+apache::vhost{'%s':
+    server_name => '%s',
+    serveraliases => ['%s'],
+    docroot => '/var/www/%s',
+    port    => '80',
+    env_variables => [],
+    priority      => '2',
+}
+
+mysql::db {'%s':
+  grant    => [
+    'ALL'
+  ],
+  user     => 'vagrant',
+  password => 'vagrant',
+  host     => 'localhost',
+  charset  => 'utf8',
+  require  => Class['mysql::server'],
+}
+
+END;
+
+$vhostManifests = '';
+$sites = opendir(fullpath('sites'));
+while (($file = readdir($sites)) !== false) {
+    $path = fullpath("sites/$file");
+    if (! is_dir($path)) {
+        continue;
+    }
+
+    if ($file == '.' || $file == '..') {
+        continue;
+    }
+
+    if ($file == 'default') {
+        continue;
+    }
+
+    $parts = explode('.', $file);
+
+    if (reset($parts) == 'www') {
+        array_shift($parts);
+    }
+
+    if (end($parts) == 'dev') {
+        array_pop($parts);
+    }
+    $dbName = implode('', $parts);
+    $parts[] = 'dev';
+
+    $serverName = implode('.', $parts);
+    $serverAlias = 'www.' . $serverName;
+
+    $vhost = sprintf($vhostTemplate, $serverName, $serverName, $serverAlias, $file, $dbName);
+    $vhostManifests .= $vhost;
+}
+
+file_put_contents(fullpath('puppet/manifests/vhosts.pp'), $vhostManifests);

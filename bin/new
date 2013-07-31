@@ -1,0 +1,31 @@
+#!/bin/sh
+
+if [ -z $1 ]; then
+    echo "Error: name your host something like 'awesome.dev'" 1>&2
+    exit 1
+fi
+
+base_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../ && pwd )"
+
+if [ -d "${base_dir}/sites/$1" ]; then
+    echo "Error: 'sites/$1' directory already exists." 1>&2
+    exit 1
+fi
+
+[ -d ${base_dir}/.work ] || mkdir ${base_dir}/.work
+
+cd ${base_dir}/.work
+
+curl -O https://wordpress.org/latest.tar.gz
+tar -xf latest.tar.gz
+
+if [ -d wordpress ]; then
+    mv wordpress ${base_dir}/sites/$1
+    cd $base_dir
+    rm -rf ${base_dir}/.work
+    ${base_dir}/bin/vhost
+    exit 0
+fi
+
+echo "Error: something went wrong" 1>&2
+exit 1
