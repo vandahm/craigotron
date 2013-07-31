@@ -8,6 +8,7 @@ This lets Craig use Vagrant and Puppet to set up VirtualBox for WordPress develo
     git clone https://github.com/vandahm/craigotron.git wordpress
     cd wordpress
     vagrant up
+    vagrant reload
 
 ## Adding WordPress sites ##
 
